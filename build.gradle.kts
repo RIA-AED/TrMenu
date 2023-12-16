@@ -1,5 +1,3 @@
-import java.util.Locale
-
 val taboolibVersion: String by project
 
 plugins {
@@ -24,9 +22,9 @@ tasks.jar {
 tasks.build {
     doLast {
         val plugin = project(":plugin")
-        val file = file("${plugin.layout.buildDirectory.get()}/libs").listFiles()?.find { it.endsWith("plugin-$version.jar") }
+        val file = file("${plugin.buildDir}/libs").listFiles()?.find { it.endsWith("plugin-$version.jar") }
 
-        file?.copyTo(file("${layout.buildDirectory.get()}/libs/${project.name}-$version.jar"), true)
+        file?.copyTo(file("$buildDir/libs/${project.name}-$version.jar"), true)
     }
     dependsOn(project(":plugin").tasks.build)
 }
@@ -42,19 +40,20 @@ subprojects {
 
     dependencies {
         "api"(kotlin("stdlib")) // Dreeam - compileOnly -> api, For compatibility
+        implementation("io.github.baked-libs:dough-api:1.2.0")
     }
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
     }
-    configure<JavaPluginExtension> {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+    configure<JavaPluginConvention> {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     val archiveName = if (project == rootProject)
-        rootProject.name.lowercase(Locale.getDefault())
+        rootProject.name.toLowerCase()
     else
-        "${rootProject.name.lowercase(Locale.getDefault())}-${project.name.lowercase(Locale.getDefault())}"
+        "${rootProject.name.toLowerCase()}-${project.name.toLowerCase()}"
 
     val sourceSets = extensions.getByName("sourceSets") as SourceSetContainer
 
